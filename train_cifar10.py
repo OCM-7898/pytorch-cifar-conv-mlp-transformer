@@ -29,6 +29,7 @@ from utils import progress_bar
 from randomaug import RandAugment
 from models.vit import ViT
 from models.convmixer import ConvMixer
+from models.raft_mlp import RaftMLP
 
 # parsers
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -129,6 +130,8 @@ elif args.net=="mlpmixer":
     depth = 6,
     num_classes = 10
 )
+elif args.net=="raft_mlp":
+    net = RaftMLP()
 elif args.net=="vit_small":
     from models.vit_small import ViT
     net = ViT(
