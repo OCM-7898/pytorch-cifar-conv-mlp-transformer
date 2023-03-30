@@ -49,7 +49,7 @@ def main(args,
 
     print('==> Preparing data..')
 
-    if net in [ 'raft_mlp', 'resmlp'] or 'swin' in net or 'cross' in net or 'pvt' or 'vit' in net or 'gcvit' in net or 'cait' in net or 'visformer' in net or 'vip' in net or 'max' in net:
+    if net in [ 'raft_mlp', 'resmlp'] or 'swin' in net or 'cross' in net or 'pvt' in net or 'vit' in net or 'gcvit' in net or 'cait' in net or 'visformer' in net or 'vip' in net or 'max' in net:
         img_size = 224
     elif net in ['swinmlp_tiny_c6', 'swinmlp_tiny_c12', 'swinmlp_tiny_c24']:
         img_size = 256
