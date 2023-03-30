@@ -2,6 +2,16 @@
 from models.vgg import *
 from models.googlenet import *
 from models.resnet import *
+
+
+#from preact_resnet import *
+#from mobilenet import *
+from models.mobilenetv2 import *
+from models.convmlp import *
+from models.g_mlp import *
+from models.sparse_mlp import *
+from models.morph_mlp import *
+
 from models.efficientnet import *
 from models.densenet import *
 from models.convnext import *
@@ -41,4 +51,5 @@ from models.msmlp import *
 from models.wavemlp import *
 from models.hiremlp import *
 from models.raft_mlp import *
+
 

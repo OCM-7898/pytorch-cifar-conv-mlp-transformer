@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
@@ -289,7 +288,6 @@ def main(args,
         if early_stopper.early_stop(val_loss):
             print('We are at epoch:', epoch, 'and we are stopping early')
             break
-
     # writeout wandb
     if usewandb:
         try:
@@ -312,6 +310,7 @@ def main(args,
             print('Failed to log model to wandb')
         
         wandb.finish()
+
 
 
 if __name__ == '__main__':
@@ -371,6 +370,7 @@ if __name__ == '__main__':
         else:
             watermark = args.watermark
         wandb.init(
+
             project='PyTorch-Cifar-10', entity='iut-hert', name=watermark, config=args
         )
         art = wandb.Artifact(watermark, type='model')
