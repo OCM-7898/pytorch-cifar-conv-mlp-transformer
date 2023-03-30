@@ -2,20 +2,6 @@ from models import *
 
 
 def Net(args, img_size, num_classes, bs, patch, dimhead, convkernel):
-    elif args.net=="mobilenet_v2":
-        net=MobileNetV2()
-    elif args.net=="convmlp_small":
-        net=ConvMLP(blocks=[2, 4, 2],dims=[128, 256, 512],mlp_ratios=[2, 2, 2])
-    elif args.net=="convmlp_medium":
-        net=ConvMLP(blocks=[3, 6, 3], mlp_ratios=[3, 3, 3], dims=[128, 256, 512])
-    elif args.net=="convmlp_large":
-        net=ConvMLP(blocks=[4, 8, 3], mlp_ratios=[3, 3, 3], dims=[192, 384, 768])
-    elif args.net=="g_mlp":
-        net=gMLPForImageClassification()
-    elif args.net=="sparse_mlp":
-        net=SparseMLP()
-    elif args.net=="morph_mlp":
-        net=MorphMLP()
     """_summary_
     Parameters
     ----------
