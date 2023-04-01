@@ -8,7 +8,6 @@ from timm.models.registry import register_model
 from timm.models.vision_transformer import _cfg
 import math
 
-
 class Mlp(nn.Module):
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0., linear=False):
         super().__init__()
@@ -313,88 +312,3 @@ class DWConv(nn.Module):
         x = x.flatten(2).transpose(1, 2)
 
         return x
-
-
-def _conv_filter(state_dict, patch_size=16):
-    """ convert patch embedding weight from manual patchify + linear proj to conv"""
-    out_dict = {}
-    for k, v in state_dict.items():
-        if 'patch_embed.proj.weight' in k:
-            v = v.reshape((v.shape[0], 3, patch_size, patch_size))
-        out_dict[k] = v
-
-    return out_dict
-
-@register_model
-def pvt_v2_b0(pretrained=False, **kwargs):
-    model = PyramidVisionTransformerV2(
-        patch_size=4, embed_dims=[32, 64, 160, 256], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, eps=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1],
-        **kwargs)
-    model.default_cfg = _cfg()
-
-    return model
-
-
-@register_model
-def pvt_v2_b1(pretrained=False, **kwargs):
-    model = PyramidVisionTransformerV2(
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, eps=1e-6), depths=[2, 2, 2, 2], sr_ratios=[8, 4, 2, 1],
-        **kwargs)
-    model.default_cfg = _cfg()
-
-    return model
-
-
-@register_model
-def pvt_v2_b2(pretrained=False, **kwargs):
-    model = PyramidVisionTransformerV2(
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, eps=1e-6), depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], **kwargs)
-    model.default_cfg = _cfg()
-
-    return model
-
-
-@register_model
-def pvt_v2_b3(pretrained=False, **kwargs):
-    model = PyramidVisionTransformerV2(
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, eps=1e-6), depths=[3, 4, 18, 3], sr_ratios=[8, 4, 2, 1],
-        **kwargs)
-    model.default_cfg = _cfg()
-
-    return model
-
-
-@register_model
-def pvt_v2_b4(pretrained=False, **kwargs):
-    model = PyramidVisionTransformerV2(
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, eps=1e-6), depths=[3, 8, 27, 3], sr_ratios=[8, 4, 2, 1],
-        **kwargs)
-    model.default_cfg = _cfg()
-
-    return model
-
-
-@register_model
-def pvt_v2_b5(pretrained=False, **kwargs):
-    model = PyramidVisionTransformerV2(
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[4, 4, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, eps=1e-6), depths=[3, 6, 40, 3], sr_ratios=[8, 4, 2, 1],
-        **kwargs)
-    model.default_cfg = _cfg()
-
-    return model
-
-
-@register_model
-def pvt_v2_b2_li(pretrained=False, **kwargs):
-    model = PyramidVisionTransformerV2(
-        patch_size=4, embed_dims=[64, 128, 320, 512], num_heads=[1, 2, 5, 8], mlp_ratios=[8, 8, 4, 4], qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, eps=1e-6), depths=[3, 4, 6, 3], sr_ratios=[8, 4, 2, 1], linear=True, **kwargs)
-    model.default_cfg = _cfg()
-
-    return model

@@ -1,26 +1,5 @@
-import torch
 import torch.nn as nn
-
-from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from timm.models.layers import DropPath, trunc_normal_
-from timm.models.registry import register_model
-
-def _cfg(url='', **kwargs):
-    return {
-        'url': url,
-        'num_classes': 1000, 'input_size': (3, 224, 224), 'pool_size': None,
-        'crop_pct': .96, 'interpolation': 'bicubic',
-        'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD, 'classifier': 'head',
-        **kwargs
-    }
-
-default_cfgs = {
-    'ViP_S': _cfg(crop_pct=0.9),
-    'ViP_M': _cfg(crop_pct=0.9),
-    'ViP_L': _cfg(crop_pct=0.875),
-}
-
-
 class Mlp(nn.Module):
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
         super().__init__()
@@ -206,56 +185,3 @@ class VisionPermutator(nn.Module):
         x = self.forward_tokens(x)
         x = self.norm(x)
         return self.head(x.mean(1))
-
-
-
-
-@register_model
-def vip_s14(pretrained=False, **kwargs):
-    layers = [4, 3, 8, 3]
-    transitions = [False, False, False, False]
-    segment_dim = [16, 16, 16, 16]
-    mlp_ratios = [3, 3, 3, 3]
-    embed_dims = [384, 384, 384, 384]
-    model = VisionPermutator(layers, embed_dims=embed_dims, patch_size=14, transitions=transitions,
-        segment_dim=segment_dim, mlp_ratios=mlp_ratios, mlp_fn=WeightedPermuteMLP, **kwargs)
-    model.default_cfg = default_cfgs['ViP_S']
-    return model
-
-@register_model
-def vip_s7(pretrained=False, **kwargs):
-    layers = [4, 3, 8, 3]
-    transitions = [True, False, False, False]
-    segment_dim = [32, 16, 16, 16]
-    mlp_ratios = [3, 3, 3, 3]
-    embed_dims = [192, 384, 384, 384]
-    model = VisionPermutator(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-        segment_dim=segment_dim, mlp_ratios=mlp_ratios, mlp_fn=WeightedPermuteMLP, **kwargs)
-    model.default_cfg = default_cfgs['ViP_S']
-    return model
-
-@register_model
-def vip_m7(pretrained=False, **kwargs):
-    # 55534632
-    layers = [4, 3, 14, 3]
-    transitions = [False, True, False, False]
-    segment_dim = [32, 32, 16, 16]
-    mlp_ratios = [3, 3, 3, 3]
-    embed_dims = [256, 256, 512, 512]
-    model = VisionPermutator(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-        segment_dim=segment_dim, mlp_ratios=mlp_ratios, mlp_fn=WeightedPermuteMLP, **kwargs)
-    model.default_cfg = default_cfgs['ViP_M']
-    return model
-
-
-@register_model
-def vip_l7(pretrained=False, **kwargs):
-    layers = [8, 8, 16, 4]
-    transitions = [True, False, False, False]
-    segment_dim = [32, 16, 16, 16]
-    mlp_ratios = [3, 3, 3, 3]
-    embed_dims = [256, 512, 512, 512]
-    model = VisionPermutator(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-        segment_dim=segment_dim, mlp_ratios=mlp_ratios, mlp_fn=WeightedPermuteMLP, **kwargs)
-    model.default_cfg = default_cfgs['ViP_L']
-    return model
