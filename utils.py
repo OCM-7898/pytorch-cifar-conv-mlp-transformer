@@ -9,7 +9,7 @@ import os
 import sys
 import time
 import numpy as np
-
+import torch
 import torch.nn as nn
 import torch.nn.init as init
 
@@ -127,7 +127,7 @@ def format_time(seconds):
     if f == '':
         f = '0ms'
     return f
-
+    
 class EarlyStopper:
     def __init__(self, patience=1, min_delta=0):
         self.patience = patience
@@ -144,3 +144,4 @@ class EarlyStopper:
             if self.counter >= self.patience:
                 return True
         return False
+
