@@ -38,9 +38,9 @@ from models.swinmlp import *
 from models.vit import *
 from models.dpn import *
 from models.crossvit import *
-from models.pvt import PyramidVisionTransformer
+from models.pvt import *
 from models.pvt_v2 import *
-from models.visformer import Visformer
+from models.visformer import *
 from models.resmlp import *
 from models.vip import *
 from models.maxvit import *

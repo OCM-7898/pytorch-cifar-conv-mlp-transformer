@@ -2,34 +2,9 @@
 import os
 import torch
 import torch.nn as nn
-
-from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from timm.models.layers import DropPath, trunc_normal_
-from timm.models.registry import register_model
 from timm.models.layers.helpers import to_2tuple
-
-import math
-from torch import Tensor
-from torch.nn import init
-from torch.nn.modules.utils import _pair
 import torch.nn.functional as F
-
-
-def _cfg(url='', **kwargs):
-    return {
-        'url': url,
-        'num_classes': 1000, 'input_size': (3, 224, 224), 'pool_size': None,
-        'crop_pct': .96, 'interpolation': 'bicubic',
-        'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD, 'classifier': 'head',
-        **kwargs
-    }
-
-default_cfgs = {
-    'wave_T': _cfg(crop_pct=0.9),
-    'wave_S': _cfg(crop_pct=0.9),
-    'wave_M': _cfg(crop_pct=0.9),
-    'wave_B': _cfg(crop_pct=0.875),
-}
 
 class Mlp(nn.Module):
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
@@ -250,59 +225,4 @@ class WaveNet(nn.Module):
         return cls_out
 
 def MyNorm(dim):
-    return nn.GroupNorm(1, dim)    
-    
-@register_model
-def WaveMLP_T_dw(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [2, 2, 4, 2]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    model = WaveNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios,mode='depthwise', **kwargs)
-    model.default_cfg = default_cfgs['wave_T']
-    return model    
-    
-@register_model
-def WaveMLP_T(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [2, 2, 4, 2]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    model = WaveNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios, **kwargs)
-    model.default_cfg = default_cfgs['wave_T']
-    return model
-
-@register_model
-def WaveMLP_S(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [2, 3, 10, 3]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    model = WaveNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios,norm_layer=MyNorm, **kwargs)
-    model.default_cfg = default_cfgs['wave_S']
-    return model
-
-@register_model
-def WaveMLP_M(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [3, 4, 18, 3]
-    mlp_ratios = [8, 8, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    model = WaveNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios,norm_layer=MyNorm,ds_use_norm=False, **kwargs)
-    model.default_cfg = default_cfgs['wave_M']
-    return model
-
-@register_model
-def WaveMLP_B(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [2, 2, 18, 2]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [96, 192, 384, 768]
-    model = WaveNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios,norm_layer=MyNorm,ds_use_norm=False, **kwargs)
-    model.default_cfg = default_cfgs['wave_B']
-    return 
+    return nn.GroupNorm(1, dim)

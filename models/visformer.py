@@ -4,10 +4,6 @@ from einops import rearrange
 from timm.models.layers import to_2tuple, trunc_normal_
 import torch.nn.functional as F
 
-__all__=[
-    'visformer_small', 'visformer_tiny', 'net1', 'net2', 'net3', 'net4', 'net5', 'net6', 'net7'
-]
-
 def drop_path(x, drop_prob:float = 0., training: bool = False):
     if drop_prob == 0. or not training:
         return x
@@ -340,57 +336,3 @@ class Visformer(nn.Module):
 
         x = self.head( x.view(x.size(0), -1) )
         return x
-
-def visformer_tiny(**kwargs):
-    model = Visformer(img_size=224, init_channels=16, embed_dim=192, depth=[7,4,4], num_heads=3, mlp_ratio=4., group=8,
-                      attn_stage='011', spatial_conv='100', norm_layer=nn.BatchNorm2d, conv_init=True,
-                      embedding_norm=BatchNorm, **kwargs)
-    return model
-
-
-def visformer_small(**kwargs):
-    model = Visformer(img_size=224, init_channels=32, embed_dim=384, depth=[7,4,4], num_heads=6, mlp_ratio=4., group=8,
-                      attn_stage='011', spatial_conv='100', norm_layer=nn.BatchNorm2d, conv_init=True,
-                      embedding_norm=nn.BatchNorm2d, **kwargs)
-    return model
-
-
-def net1(**kwargs):
-    model = Visformer(init_channels=None, embed_dim=384, depth=[0,12,0], num_heads=6, mlp_ratio=4., attn_stage='111',
-                      spatial_conv='000', vit_embedding=True, norm_layer=nn.LayerNorm, conv_init=True, **kwargs)
-    return model
-
-
-def net2(**kwargs):
-    model = Visformer(init_channels=32, embed_dim=384, depth=[0,12,0], num_heads=6, mlp_ratio=4., attn_stage='111',
-                      spatial_conv='000', vit_embedding=False, norm_layer=nn.LayerNorm, conv_init=True, **kwargs)
-    return model
-
-
-def net3(**kwargs):
-    model = Visformer(init_channels=32, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4., attn_stage='111',
-                      spatial_conv='000', vit_embedding=False, norm_layer=nn.LayerNorm, conv_init=True, **kwargs)
-    return model
-
-
-def net4(**kwargs):
-    model = Visformer(init_channels=32, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4., attn_stage='111',
-                      spatial_conv='000', vit_embedding=False, norm_layer=nn.BatchNorm2d, conv_init=True, **kwargs)
-    return model
-
-
-def net5(**kwargs):
-    model = Visformer(init_channels=32, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4., group=1, attn_stage='111',
-                      spatial_conv='111', vit_embedding=False, norm_layer=nn.BatchNorm2d, conv_init=True, **kwargs)
-    return model
-
-
-def net6(**kwargs):
-    model = Visformer(init_channels=32, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4., group=1, attn_stage='111',
-                      pos_embed=False, spatial_conv='111', norm_layer=nn.BatchNorm2d, conv_init=True, **kwargs)
-    return model
-
-
-def net7(**kwargs):
-    model = Visformer(init_channels=32, embed_dim=384, depth=[6,7,7], num_heads=6, group=1, attn_stage='000',
-                      pos_embed=False, spatial_conv='111', norm_layer=nn.BatchNorm2d, conv_init=True, **kwargs)

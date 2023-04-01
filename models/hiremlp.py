@@ -5,24 +5,8 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn import init
-from torch.nn.modules.utils import _pair
-
-from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from timm.models.layers import DropPath, trunc_normal_
-from timm.models.registry import register_model
 from timm.models.layers.helpers import to_2tuple
-
-
-def _cfg(url='', **kwargs):
-    return {
-        'url': url,
-        'num_classes': 1000, 'input_size': (3, 224, 224), 'pool_size': None,
-        'crop_pct': 0.9, 'interpolation': 'bicubic',
-        'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD, 'classifier': 'head',
-        **kwargs
-    }
-
 
 class Mlp(nn.Module):
     def __init__(self, in_features, hidden_features=None, out_features=None, drop=0.):
@@ -288,75 +272,3 @@ class HireMLPNet(nn.Module):
         x = self.norm(x)
         cls_out = self.head(x.flatten(2).mean(2))
         return cls_out
-
-    
-@register_model
-def hire_mlp_tiny(pretrained=False, **kwargs):
-    layers = [2, 2, 4, 2]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    pixel = [4, 3, 3, 2]
-    step_stride = [2, 2, 3, 2]
-    step_dilation = [2, 2, 1, 1]
-    step_pad_mode = 'c'
-    pixel_pad_mode = 'c'
-    model = HireMLPNet(
-        layers, embed_dims=embed_dims, patch_size=7, mlp_ratios=mlp_ratios, pixel=pixel,
-        step_stride=step_stride, step_dilation=step_dilation,
-        step_pad_mode=step_pad_mode, pixel_pad_mode=pixel_pad_mode, **kwargs)
-    model.default_cfg = _cfg()
-    return model
-
-
-@register_model
-def hire_mlp_small(pretrained=False, **kwargs):
-    layers = [3, 4, 10, 3]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    pixel = [4, 3, 3, 2]
-    step_stride = [2, 2, 3, 2]
-    step_dilation = [2, 2, 1, 1]
-    step_pad_mode = 'c'
-    pixel_pad_mode = 'c'
-    model = HireMLPNet(
-        layers, embed_dims=embed_dims, patch_size=7, mlp_ratios=mlp_ratios, pixel=pixel,
-        step_stride=step_stride, step_dilation=step_dilation,
-        step_pad_mode=step_pad_mode, pixel_pad_mode=pixel_pad_mode, **kwargs)
-    model.default_cfg = _cfg()
-    return model
-
-
-@register_model
-def hire_mlp_base(pretrained=False, **kwargs):
-    layers = [4, 6, 24, 3]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    pixel = [4, 3, 3, 2]
-    step_stride = [2, 2, 3, 2]
-    step_dilation = [2, 2, 1, 1]
-    step_pad_mode = 'c'
-    pixel_pad_mode = 'c'
-    model = HireMLPNet(
-        layers, embed_dims=embed_dims, patch_size=7, mlp_ratios=mlp_ratios, pixel=pixel,
-        step_stride=step_stride, step_dilation=step_dilation,
-        step_pad_mode=step_pad_mode, pixel_pad_mode=pixel_pad_mode, **kwargs)
-    model.default_cfg = _cfg()
-    return model
-
-
-@register_model
-def hire_mlp_large(pretrained=False, **kwargs):
-    layers = [4, 6, 24, 3]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [96, 192, 384, 768]
-    pixel = [4, 3, 3, 2]
-    step_stride = [2, 2, 3, 2]
-    step_dilation = [2, 2, 1, 1]
-    step_pad_mode = 'c'
-    pixel_pad_mode = 'c'
-    model = HireMLPNet(
-        layers, embed_dims=embed_dims, patch_size=7, mlp_ratios=mlp_ratios, pixel=pixel,
-        step_stride=step_stride, step_dilation=step_dilation,
-        step_pad_mode=step_pad_mode, pixel_pad_mode=pixel_pad_mode, **kwargs)
-    model.default_cfg = _cfg()
-    return model

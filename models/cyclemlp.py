@@ -2,9 +2,7 @@ import os
 import torch
 import torch.nn as nn
 
-from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from timm.models.layers import DropPath, trunc_normal_
-from timm.models.registry import register_model
 from timm.models.layers.helpers import to_2tuple
 
 import math
@@ -12,40 +10,6 @@ from torch import Tensor
 from torch.nn import init
 from torch.nn.modules.utils import _pair
 from torchvision.ops.deform_conv import deform_conv2d as deform_conv2d_tv
-
-try:
-    from mmseg.models.builder import BACKBONES as seg_BACKBONES
-    from mmseg.utils import get_root_logger
-    from semantic.custom_fun import load_checkpoint
-    has_mmseg = True
-except ImportError:
-    print('Please Install mmsegmentation first for semantic segmentation.')
-    has_mmseg = False
-
-try:
-    from mmdet.models.builder import BACKBONES as det_BACKBONES
-    from mmdet.utils import get_root_logger
-    has_mmdet = True
-except ImportError:
-    print('Please Install mmdetection first for object detection and instance segmentation.')
-    has_mmdet = False
-
-
-def _cfg(url='', **kwargs):
-    return {
-        'url': url,
-        'num_classes': 1000, 'input_size': (3, 224, 224), 'pool_size': None,
-        'crop_pct': .96, 'interpolation': 'bicubic',
-        'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD, 'classifier': 'head',
-        **kwargs
-    }
-
-default_cfgs = {
-    'cycle_S': _cfg(crop_pct=0.9),
-    'cycle_M': _cfg(crop_pct=0.9),
-    'cycle_L': _cfg(crop_pct=0.875),
-}
-
 
 class Mlp(nn.Module):
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
@@ -362,123 +326,3 @@ class CycleNet(nn.Module):
         x = self.norm(x)
         cls_out = self.head(x.mean(1))
         return cls_out
-
-
-@register_model
-def CycleMLP_B1(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [2, 2, 4, 2]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    model = CycleNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, **kwargs)
-    model.default_cfg = default_cfgs['cycle_S']
-    return model
-
-
-@register_model
-def CycleMLP_B2(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [2, 3, 10, 3]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    model = CycleNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, **kwargs)
-    model.default_cfg = default_cfgs['cycle_S']
-    return model
-
-
-@register_model
-def CycleMLP_B3(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [3, 4, 18, 3]
-    mlp_ratios = [8, 8, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    model = CycleNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, **kwargs)
-    model.default_cfg = default_cfgs['cycle_M']
-    return model
-
-
-@register_model
-def CycleMLP_B4(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [3, 8, 27, 3]
-    mlp_ratios = [8, 8, 4, 4]
-    embed_dims = [64, 128, 320, 512]
-    model = CycleNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, **kwargs)
-    model.default_cfg = default_cfgs['cycle_L']
-    return model
-
-
-@register_model
-def CycleMLP_B5(pretrained=False, **kwargs):
-    transitions = [True, True, True, True]
-    layers = [3, 4, 24, 3]
-    mlp_ratios = [4, 4, 4, 4]
-    embed_dims = [96, 192, 384, 768]
-    model = CycleNet(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                     mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, **kwargs)
-    model.default_cfg = default_cfgs['cycle_L']
-    return model
-
-
-if has_mmseg and has_mmdet:
-    # For dense prediction tasks only
-    @seg_BACKBONES.register_module()
-    @det_BACKBONES.register_module()
-    class CycleMLP_B1_feat(CycleNet):
-        def __init__(self, **kwargs):
-            transitions = [True, True, True, True]
-            layers = [2, 2, 4, 2]
-            mlp_ratios = [4, 4, 4, 4]
-            embed_dims = [64, 128, 320, 512]
-            super(CycleMLP_B1_feat, self).__init__(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                                                   mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, fork_feat=True)
-
-    @seg_BACKBONES.register_module()
-    @det_BACKBONES.register_module()
-    class CycleMLP_B2_feat(CycleNet):
-        def __init__(self, **kwargs):
-            transitions = [True, True, True, True]
-            layers = [2, 3, 10, 3]
-            mlp_ratios = [4, 4, 4, 4]
-            embed_dims = [64, 128, 320, 512]
-            super(CycleMLP_B2_feat, self).__init__(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                                                   mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, fork_feat=True)
-
-
-    @seg_BACKBONES.register_module()
-    @det_BACKBONES.register_module()
-    class CycleMLP_B3_feat(CycleNet):
-        def __init__(self, **kwargs):
-            transitions = [True, True, True, True]
-            layers = [3, 4, 18, 3]
-            mlp_ratios = [8, 8, 4, 4]
-            embed_dims = [64, 128, 320, 512]
-            super(CycleMLP_B3_feat, self).__init__(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                                                   mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, fork_feat=True)
-
-    @seg_BACKBONES.register_module()
-    @det_BACKBONES.register_module()
-    class CycleMLP_B4_feat(CycleNet):
-        def __init__(self, **kwargs):
-            transitions = [True, True, True, True]
-            layers = [3, 8, 27, 3]
-            mlp_ratios = [8, 8, 4, 4]
-            embed_dims = [64, 128, 320, 512]
-            super(CycleMLP_B4_feat, self).__init__(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                                                   mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, fork_feat=True)
-
-
-    @seg_BACKBONES.register_module()
-    @det_BACKBONES.register_module()
-    class CycleMLP_B5_feat(CycleNet):
-        def __init__(self, **kwargs):
-            transitions = [True, True, True, True]
-            layers = [3, 4, 24, 3]
-            mlp_ratios = [4, 4, 4, 4]
-            embed_dims = [96, 192, 384, 768]
-            super(CycleMLP_B5_feat, self).__init__(layers, embed_dims=embed_dims, patch_size=7, transitions=transitions,
-                                                   mlp_ratios=mlp_ratios, mlp_fn=CycleMLP, fork_feat=True)
